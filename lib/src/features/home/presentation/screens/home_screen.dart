@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'teyasantalucia_screen.dart';
 import 'apoala_screen.dart'; // Import the ApoalaScreen
 import 'coyote_screen.dart'; // Import the CoyoteScreen
+import 'babes_screen.dart'; // Import the BabesScreen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -120,11 +121,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           80), // Space between RestaurantCard2 and RestaurantCard3
 
                   // Tarjeta 3 (RestaurantCard)
-                  const RestaurantCard(
+                  RestaurantCard(
                     imagePath:
                         'assets/images/Babes.png', // Using a different image for variety
                     name: 'Babe´s',
                     rating: 4.5,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const BabesScreen()),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 80), // Space after RestaurantCard3
