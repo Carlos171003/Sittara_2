@@ -16,6 +16,21 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Restaurant> _allRestaurants = [];
   List<Restaurant> _filteredRestaurants = [];
+  String? _selectedFoodType; // Para el tipo de comida seleccionado
+
+  // Lista de todos los tipos de comida disponibles
+  final List<String> _foodTypes = [
+    'Yucateca',
+    'Mexicana',
+    'Contemporánea',
+    'Bistró',
+    'Internacional',
+    'Italiana',
+    'Francesa',
+    'Asiática',
+    'Tailandesa',
+    'Noodles',
+  ];
 
   @override
   void initState() {
@@ -24,15 +39,17 @@ class _HomeScreenState extends State<HomeScreen> {
     _filteredRestaurants = _allRestaurants;
   }
 
-  void _filterRestaurants(String query) {
-    setState(() {
-      _filteredRestaurants = _allRestaurants
-          .where((restaurant) =>
-              restaurant.name.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
-
+        void _filterRestaurants(String query) {
+          setState(() {
+            _filteredRestaurants = _allRestaurants.where((restaurant) {
+              final matchesQuery =
+                  restaurant.name.toLowerCase().contains(query.toLowerCase());
+              final matchesFoodType = _selectedFoodType == null ||
+                  restaurant.foodTypes.contains(_selectedFoodType);
+              return matchesQuery && matchesFoodType;
+            }).toList();
+          });
+        }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,20 +106,62 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // Search bar
+          // Search bar and Food Type Filter
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _filterRestaurants, // Hook up the filtering logic
-              decoration: InputDecoration(
-                hintText: 'Buscar restaurantes...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (query) {
+                      _filterRestaurants(query);
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Buscar restaurantes...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8), // Espacio entre el buscador y el filtro
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedFoodType,
+                    hint: const Text('Tipo de comida'),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    items: _foodTypes.map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(type),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedFoodType = value;
+                        _filterRestaurants(_searchController.text);
+                      });
+                    },
+                    // Añadir una opción para limpiar el filtro
+                    onTap: () {
+                      if (_selectedFoodType != null) {
+                        setState(() {
+                          _selectedFoodType = null;
+                          _filterRestaurants(_searchController.text);
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           // Remaining content on white background

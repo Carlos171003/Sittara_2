@@ -4,6 +4,7 @@ class Restaurant {
   final double longitude;
   final String description;
   final String priceRange; // Ej: "\$\$\$", "\$\$"
+  final List<String> foodTypes; // Ej: ['Yucateca', 'Mexicana']
 
   Restaurant({
     required this.name,
@@ -11,6 +12,7 @@ class Restaurant {
     required this.longitude,
     required this.description,
     required this.priceRange,
+    required this.foodTypes,
   });
 }
 
@@ -22,6 +24,7 @@ final List<Restaurant> elegantRestaurantsMerida = [
     description:
         'Cocina de autor con toques yucatecos en un ambiente sofisticado.',
     priceRange: '\$\$\$',
+    foodTypes: ['Yucateca', 'Contemporánea'],
   ),
   Restaurant(
     name: 'Teya Santa Lucía',
@@ -30,6 +33,7 @@ final List<Restaurant> elegantRestaurantsMerida = [
     description:
         'Tradición yucateca en un hermoso patio colonial, con platillos auténticos.',
     priceRange: '\$\$',
+    foodTypes: ['Yucateca', 'Mexicana'],
   ),
   Restaurant(
     name: 'Bistrola 57',
@@ -38,6 +42,7 @@ final List<Restaurant> elegantRestaurantsMerida = [
     description:
         'Bistro francés con un toque moderno, ideal para una cena elegante.',
     priceRange: '\$\$\$',
+    foodTypes: ['Bistró', 'Francesa'],
   ),
   Restaurant(
     name: 'Apoala',
@@ -45,6 +50,7 @@ final List<Restaurant> elegantRestaurantsMerida = [
     longitude: -89.622000,
     description: 'Cocina oaxaqueña contemporánea en el corazón de Santa Lucía.',
     priceRange: '\$\$\$',
+    foodTypes: ['Mexicana', 'Contemporánea'],
   ),
   Restaurant(
     name: 'Babe’s',
@@ -53,6 +59,7 @@ final List<Restaurant> elegantRestaurantsMerida = [
     description:
         'Un lugar con ambiente relajado y platillos internacionales con un toque único.',
     priceRange: '\$\$',
+    foodTypes: ['Internacional', 'Asiática', 'Noodles'],
   ),
   Restaurant(
     name: 'Pita Mediterránea',
@@ -60,5 +67,6 @@ final List<Restaurant> elegantRestaurantsMerida = [
     longitude: -89.619000,
     description: 'Sabores auténticos del Mediterráneo en un ambiente acogedor.',
     priceRange: '\$\$',
+    foodTypes: ['Internacional'],
   ),
 ];
