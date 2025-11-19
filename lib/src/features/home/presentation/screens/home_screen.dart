@@ -72,35 +72,24 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Stack(
-                  // Changed from Row to Stack
-                  alignment: Alignment.center, // Center the children by default
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distribuye los elementos
                   children: [
-                    Align(
-                      // Align IconButton to the left
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        padding: const EdgeInsets.all(
-                            20), // Further increased padding for easier tap
-                        icon: const Icon(Icons.menu,
-                            size: 30, color: Colors.black87),
-                        onPressed: () {
-                          // Navigator.push( // This will be handled by named routes
-                          //   context,
-                          //   MaterialPageRoute(
-                          //       builder: (context) => const MenuScreen()),
-                          // );
-                          Navigator.pushNamed(context, '/menu');
-                        },
-                      ),
+                    IconButton(
+                      padding: const EdgeInsets.all(20),
+                      icon: const Icon(Icons.menu,
+                          size: 30, color: Colors.black87),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/menu');
+                      },
                     ),
-                    // CircleAvatar is now implicitly centered by the Stack's alignment
                     const CircleAvatar(
                       radius: 25, // Reduced radius for top bar
                       backgroundColor: Colors.white,
                       backgroundImage:
                           AssetImage('assets/images/LogoFinal.png'),
                     ),
+                    const SizedBox(width: 60), // Añadir espacio para balancear, ya que el IconButton está a la izquierda
                   ],
                 ),
               ),
