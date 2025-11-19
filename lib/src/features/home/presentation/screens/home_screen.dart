@@ -134,12 +134,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   flex: 2, // Dar menos espacio al Dropdown
                   child: DropdownButtonFormField<String>(
                     value: _selectedFoodType,
-                    hint: const Text('Tipo de comida'),
+                    // Eliminamos el hintText para ahorrar espacio
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reducir padding
+                      contentPadding: EdgeInsets.zero, // Padding mínimo
                     ),
                     items: _foodTypes.map((type) {
                       return DropdownMenuItem(
