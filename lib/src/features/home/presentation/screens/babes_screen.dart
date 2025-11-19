@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_24/src/features/reserva/reserva_page.dart'; // Importa ReservaPage
 import '../widgets/info_list.dart';
 import '../widgets/specialties_card.dart';
 
@@ -168,6 +169,31 @@ class BabesScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
+                  ),
+
+                  const SizedBox(height: 24), // Espacio vertical
+
+                  // Botón para hacer reserva
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 48),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ReservaPage()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary, // Color de fondo del botón
+                        foregroundColor: Colors.white, // Color del texto
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Hacer Reserva'),
+                    ),
                   ),
 
                   const SizedBox(height: 24), // Espacio vertical antes del menú

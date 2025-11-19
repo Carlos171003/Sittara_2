@@ -249,14 +249,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 backgroundColor: Colors.green),
                           );
 
-                          // Navigate to login screen
-
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (e) => const LoginScreen(),
-                            ),
-                          );
+                          // Navigate to home screen
+                          Navigator.of(context).pushReplacementNamed('/home');
                         }
                       } catch (error) {
                         if (!context.mounted) return;

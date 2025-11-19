@@ -188,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : 0.0, // Default if not found
                         onTap: navigationAction,
                       ),
-                      const SizedBox(height: 80),
+                      const SizedBox(height: 20),
                     ],
                   );
                 }).toList(),

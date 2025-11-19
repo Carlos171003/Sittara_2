@@ -100,7 +100,7 @@ class _ReservaPageState extends State<ReservaPage> {
       await supabase.from('reservations').insert({
         'name': _nombreController.text,
         'phone': _telefonoController.text,
-        'date': _fechaController
+        'reservation_date': _fechaController
             .text, // Se guarda como texto, asegúrate que la columna en Supabase sea de tipo 'text' o 'varchar'
         'time': _horaController.text, // Lo mismo para la hora
         'people': _personas,
