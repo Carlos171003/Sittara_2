@@ -110,63 +110,66 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Reducir padding horizontal
-            child: Row(
-              children: [
-                Flexible( // Usar Flexible en lugar de Expanded
-                  flex: 2, // Ajustar flex
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (query) {
-                      _filterRestaurants(query);
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Buscar restaurantes...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+            child: FittedBox( // Usar FittedBox para forzar que el contenido quepa
+              fit: BoxFit.scaleDown, // Escalar el contenido si es necesario
+              child: Row(
+                children: [
+                  Flexible( // Usar Flexible en lugar de Expanded
+                    flex: 2, // Ajustar flex
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (query) {
+                        _filterRestaurants(query);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Buscar restaurantes...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reducir padding
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reducir padding
                     ),
                   ),
-                ),
-                // const SizedBox(width: 4), // Eliminado el espacio entre el buscador y el filtro
-                ConstrainedBox( // Forzar un ancho máximo para diagnosticar
-                  constraints: const BoxConstraints(maxWidth: 120), // Un ancho muy pequeño para probar
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedFoodType,
-                    isDense: true, // Hacerlo más compacto
-                    decoration: InputDecoration(
-                      border: InputBorder.none, // Eliminar el borde
-                      contentPadding: EdgeInsets.zero, // Padding mínimo
-                    ),
-                    items: _foodTypes.map((type) {
-                      return DropdownMenuItem(
-                        value: type,
-                        child: Text(
-                          type,
-                          overflow: TextOverflow.ellipsis, // Evitar desbordamiento de texto
-                          style: const TextStyle(fontSize: 12), // Reducir tamaño de fuente
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedFoodType = value;
-                        _filterRestaurants(_searchController.text);
-                      });
-                    },
-                    // Añadir una opción para limpiar el filtro
-                    onTap: () {
-                      if (_selectedFoodType != null) {
+                  // const SizedBox(width: 4), // Eliminado el espacio entre el buscador y el filtro
+                  ConstrainedBox( // Forzar un ancho máximo para diagnosticar
+                    constraints: const BoxConstraints(maxWidth: 120), // Un ancho muy pequeño para probar
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedFoodType,
+                      isDense: true, // Hacerlo más compacto
+                      decoration: InputDecoration(
+                        border: InputBorder.none, // Eliminar el borde
+                        contentPadding: EdgeInsets.zero, // Padding mínimo
+                      ),
+                      items: _foodTypes.map((type) {
+                        return DropdownMenuItem(
+                          value: type,
+                          child: Text(
+                            type,
+                            overflow: TextOverflow.ellipsis, // Evitar desbordamiento de texto
+                            style: const TextStyle(fontSize: 12), // Reducir tamaño de fuente
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
                         setState(() {
-                          _selectedFoodType = null;
+                          _selectedFoodType = value;
                           _filterRestaurants(_searchController.text);
                         });
-                      }
-                    },
+                      },
+                      // Añadir una opción para limpiar el filtro
+                      onTap: () {
+                        if (_selectedFoodType != null) {
+                          setState(() {
+                            _selectedFoodType = null;
+                            _filterRestaurants(_searchController.text);
+                          });
+                        }
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           // Remaining content on white background
