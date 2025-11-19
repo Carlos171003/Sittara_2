@@ -216,105 +216,63 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             const Center(child: CircularProgressIndicator()),
                       );
 
-                                            try {
+                      try {
+                        final supabase = Supabase.instance.client;
 
-                                              final supabase = Supabase.instance.client;
+                        final authResponse = await supabase.auth.signUp(
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text.trim(),
+                        );
 
-                                              final authResponse = await supabase.auth.signUp(
+                        if (!context.mounted) return;
 
-                                                email: _emailController.text.trim(),
+                        if (authResponse.user != null) {
+                          // Insert full name into profiles table
 
-                                                password: _passwordController.text.trim(),
+                          await supabase.from('profiles').insert({
+                            'id': authResponse.user!.id,
+                            'full_name': _fullNameController.text.trim(),
+                          });
 
-                                              );
+                          if (!context.mounted) return;
 
-                      
+                          // Hide loading indicator
 
-                                              if (!context.mounted) return;
+                          Navigator.of(context).pop();
 
-                      
+                          // Show success message
 
-                                              if (authResponse.user != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Registro exitoso. Por favor, revise su correo para la confirmación.'),
+                                backgroundColor: Colors.green),
+                          );
 
-                                                // Insert full name into profiles table
+                          // Navigate to login screen
 
-                                                await supabase.from('profiles').insert({
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (e) => const LoginScreen(),
+                            ),
+                          );
+                        }
+                      } catch (error) {
+                        if (!context.mounted) return;
 
-                                                  'id': authResponse.user!.id,
+                        // Hide loading indicator
 
-                                                  'full_name': _fullNameController.text.trim(),
+                        Navigator.of(context).pop();
 
-                                                });
+                        // Show error message
 
-                      
-
-                                                if (!context.mounted) return;
-
-                      
-
-                                                // Hide loading indicator
-
-                                                Navigator.of(context).pop();
-
-                      
-
-                                                // Show success message
-
-                                                ScaffoldMessenger.of(context).showSnackBar(
-
-                                                  const SnackBar(
-
-                                                      content: Text(
-
-                                                          'Registro exitoso. Por favor, revise su correo para la confirmación.'),
-
-                                                      backgroundColor: Colors.green),
-
-                                                );
-
-                      
-
-                                                // Navigate to login screen
-
-                                                Navigator.pushReplacement(
-
-                                                  context,
-
-                                                  MaterialPageRoute(
-
-                                                    builder: (e) => const LoginScreen(),
-
-                                                  ),
-
-                                                );
-
-                                              }
-
-                                            } catch (error) {
-
-                                              if (!context.mounted) return;
-
-                                              // Hide loading indicator
-
-                                              Navigator.of(context).pop();
-
-                      
-
-                                              // Show error message
-
-                                              ScaffoldMessenger.of(context).showSnackBar(
-
-                                                SnackBar(
-
-                                                    content:
-
-                                                        Text('Error en el registro: $error'),
-
-                                                    backgroundColor: Colors.red),
-
-                                              );
-
-                                            }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Error en el registro: $error'),
+                              backgroundColor: Colors.red),
+                        );
+                      }
                     },
                     child: const Text('Registrarse'),
                   ),

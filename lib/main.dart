@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'src/features/supabase_initializer.dart'; // Import SupabaseInitializer
 
 import 'src/features/auth/presentation/screens/login_screen.dart';
 import 'src/features/home/presentation/screens/menu_screen.dart';
@@ -13,8 +14,14 @@ import 'package:provider/provider.dart'; // Importar provider
 import 'package:flutter_application_24/src/features/distance_provider.dart'; // Importar DistanceProvider
 
 Future<void> main() async {
+  // Ensure Flutter widgets are initialized
+  WidgetsFlutterBinding.ensureInitialized();
   // Cargar las variables de entorno desde .env
   await dotenv.load(fileName: ".env");
+
+  // Initialize Supabase
+  await SupabaseInitializer.initialize();
+
   runApp(
     ChangeNotifierProvider(
       // Envolver SittaraApp con ChangeNotifierProvider
