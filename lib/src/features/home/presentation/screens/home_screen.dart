@@ -130,15 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(width: 4), // Reducir espacio entre el buscador y el filtro
-                Flexible( // Usar Flexible en lugar de Expanded
-                  flex: 1, // Ajustar flex
+                ConstrainedBox( // Forzar un ancho máximo para diagnosticar
+                  constraints: const BoxConstraints(maxWidth: 120), // Un ancho muy pequeño para probar
                   child: DropdownButtonFormField<String>(
                     value: _selectedFoodType,
-                    // Eliminamos el hintText para ahorrar espacio
+                    isDense: true, // Hacerlo más compacto
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      border: InputBorder.none, // Eliminar el borde
                       contentPadding: EdgeInsets.zero, // Padding mínimo
                     ),
                     items: _foodTypes.map((type) {
@@ -147,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           type,
                           overflow: TextOverflow.ellipsis, // Evitar desbordamiento de texto
+                          style: const TextStyle(fontSize: 12), // Reducir tamaño de fuente
                         ),
                       );
                     }).toList(),
@@ -158,7 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     // Añadir una opción para limpiar el filtro
                     onTap: () {
-                      // Solo limpiar si ya hay un valor seleccionado, para no interferir con la apertura
                       if (_selectedFoodType != null) {
                         setState(() {
                           _selectedFoodType = null;
