@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'presentation/screens/login_screen.dart'; // Assuming this is the SignInScreen equivalent
 
 class RegistrationScreen extends StatefulWidget {
@@ -12,6 +13,19 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formSignupKey = GlobalKey<FormState>();
   bool agreePersonalData = true;
+
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,6 +61,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
                 // full name
                 TextFormField(
+                  controller: _fullNameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, ingrese su nombre completo';
@@ -78,6 +93,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
                 // email
                 TextFormField(
+                  controller: _emailController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, ingrese su correo electrónico';
@@ -109,6 +125,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
                 // password
                 TextFormField(
+                  controller: _passwordController,
                   obscureText: true,
                   obscuringCharacter: '*',
                   validator: (value) {
@@ -178,22 +195,126 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formSignupKey.currentState!.validate() &&
-                          agreePersonalData) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (e) => const LoginScreen(),
-                          ),
-                        );
-                      } else if (!agreePersonalData) {
+                    onPressed: () async {
+                      if (!_formSignupKey.currentState!.validate()) {
+                        return;
+                      }
+                      if (!agreePersonalData) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text(
                                   'Por favor, acepte el procesamiento de datos personales')),
                         );
+                        return;
                       }
+
+                      // Show loading indicator
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) =>
+                            const Center(child: CircularProgressIndicator()),
+                      );
+
+                                            try {
+
+                                              final supabase = Supabase.instance.client;
+
+                                              final authResponse = await supabase.auth.signUp(
+
+                                                email: _emailController.text.trim(),
+
+                                                password: _passwordController.text.trim(),
+
+                                              );
+
+                      
+
+                                              if (!context.mounted) return;
+
+                      
+
+                                              if (authResponse.user != null) {
+
+                                                // Insert full name into profiles table
+
+                                                await supabase.from('profiles').insert({
+
+                                                  'id': authResponse.user!.id,
+
+                                                  'full_name': _fullNameController.text.trim(),
+
+                                                });
+
+                      
+
+                                                if (!context.mounted) return;
+
+                      
+
+                                                // Hide loading indicator
+
+                                                Navigator.of(context).pop();
+
+                      
+
+                                                // Show success message
+
+                                                ScaffoldMessenger.of(context).showSnackBar(
+
+                                                  const SnackBar(
+
+                                                      content: Text(
+
+                                                          'Registro exitoso. Por favor, revise su correo para la confirmación.'),
+
+                                                      backgroundColor: Colors.green),
+
+                                                );
+
+                      
+
+                                                // Navigate to login screen
+
+                                                Navigator.pushReplacement(
+
+                                                  context,
+
+                                                  MaterialPageRoute(
+
+                                                    builder: (e) => const LoginScreen(),
+
+                                                  ),
+
+                                                );
+
+                                              }
+
+                                            } catch (error) {
+
+                                              if (!context.mounted) return;
+
+                                              // Hide loading indicator
+
+                                              Navigator.of(context).pop();
+
+                      
+
+                                              // Show error message
+
+                                              ScaffoldMessenger.of(context).showSnackBar(
+
+                                                SnackBar(
+
+                                                    content:
+
+                                                        Text('Error en el registro: $error'),
+
+                                                    backgroundColor: Colors.red),
+
+                                              );
+
+                                            }
                     },
                     child: const Text('Registrarse'),
                   ),
