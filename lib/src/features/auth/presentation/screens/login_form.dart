@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../application/login_cubit.dart';
 import '../../application/login_state.dart';
+import '../../registration_screen.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -67,6 +68,17 @@ class _LoginFormState extends State<LoginForm> {
                     emailController: _emailController,
                     passwordController: _passwordController,
                   ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const RegistrationScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('¿No tienes una cuenta? Regístrate'),
+                  ),
                 ],
               ),
             ),
@@ -116,12 +128,6 @@ class _EmailInputField extends StatelessWidget {
         border: OutlineInputBorder(),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your email';
-        }
-        if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
-          return 'Please enter a valid email';
-        }
         return null;
       },
     );
@@ -158,24 +164,6 @@ class _PasswordInputField extends StatelessWidget {
         ),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your password';
-        }
-        if (value.length < 8) {
-          return 'Password must be at least 8 characters';
-        }
-        if (!value.contains(RegExp(r'[A-Z]'))){
-          return 'Password must contain at least one uppercase letter';
-        }
-        if (!value.contains(RegExp(r'[a-z]'))){
-          return 'Password must contain at least one lowercase letter';
-        }
-        if (!value.contains(RegExp(r'[0-9]'))){
-          return 'Password must contain at least one digit';
-        }
-        if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-          return 'Password must contain at least one special character';
-        }
         return null;
       },
     );
@@ -193,7 +181,7 @@ class _RememberMeCheckbox extends StatelessWidget {
           title: const Text('Remember Me'),
           value: state.isRememberMeChecked,
           onChanged: (newValue) {
-            context.read<LoginCubit>().toggleRememberMe(newValue?? false);
+            context.read<LoginCubit>().toggleRememberMe(newValue ?? false);
           },
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.zero,

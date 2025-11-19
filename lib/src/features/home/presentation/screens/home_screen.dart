@@ -3,6 +3,7 @@ import 'teyasantalucia_screen.dart';
 import 'apoala_screen.dart'; // Import the ApoalaScreen
 import 'coyote_screen.dart'; // Import the CoyoteScreen
 import 'babes_screen.dart'; // Import the BabesScreen
+import '../../../restaurants_data.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +14,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  List<Restaurant> _allRestaurants = [];
+  List<Restaurant> _filteredRestaurants = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _allRestaurants = elegantRestaurantsMerida;
+    _filteredRestaurants = _allRestaurants;
+  }
+
+  void _filterRestaurants(String query) {
+    setState(() {
+      _filteredRestaurants = _allRestaurants
+          .where((restaurant) =>
+              restaurant.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +55,16 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Stack( // Changed from Row to Stack
+                child: Stack(
+                  // Changed from Row to Stack
                   alignment: Alignment.center, // Center the children by default
                   children: [
-                    Align( // Align IconButton to the left
+                    Align(
+                      // Align IconButton to the left
                       alignment: Alignment.centerLeft,
                       child: IconButton(
-                        padding: const EdgeInsets.all(20), // Further increased padding for easier tap
+                        padding: const EdgeInsets.all(
+                            20), // Further increased padding for easier tap
                         icon: const Icon(Icons.menu,
                             size: 30, color: Colors.black87),
                         onPressed: () {
@@ -59,7 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     const CircleAvatar(
                       radius: 25, // Reduced radius for top bar
                       backgroundColor: Colors.white,
-                      backgroundImage: AssetImage('assets/images/LogoFinal.png'),
+                      backgroundImage:
+                          AssetImage('assets/images/LogoFinal.png'),
                     ),
                   ],
                 ),
@@ -68,9 +91,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           // Search bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TextField(
               controller: _searchController,
+              onChanged: _filterRestaurants, // Hook up the filtering logic
               decoration: InputDecoration(
                 hintText: 'Buscar restaurantes...',
                 prefixIcon: const Icon(Icons.search),
@@ -84,95 +109,89 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
-                children: [
-                  // Removed CircleAvatar and SizedBox from here
+                children: _filteredRestaurants.map((restaurant) {
+                  // Helper to get image path, assuming a consistent naming convention
+                  // This is a simplification and should be improved if image names vary greatly
+                  String getImageName(String name) {
+                    if (name == 'Teya Santa Lucía') return 'Teya Santa Lucia';
+                    if (name == 'Babe’s') return 'Babes';
+                    if (name == 'Pita Mediterránea') return 'Pita Mediterranea';
+                    return name;
+                  }
 
-                  // Tarjeta 1 (RestaurantCard) - positioned on white background
-                  RestaurantCard(
-                    imagePath: 'assets/images/Teya Santa Lucia.png',
-                    name: 'TEYA SANTA LUCIA',
-                    rating: 4.5,
-                    onTap: () {
+                  String imagePath =
+                      'assets/images/${getImageName(restaurant.name)}.png';
+
+                  // Determine the navigation target based on restaurant name
+                  // This needs to be consistent with how the app's routes are defined
+                  VoidCallback? navigationAction;
+                  if (restaurant.name == 'Teya Santa Lucía') {
+                    navigationAction = () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const TeyaSantaLuciaScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const TeyaSantaLuciaScreen()),
                       );
-                    },
-                  ),
-
-                  const SizedBox(height: 80), // Add SizedBox here
-
-                  // Tarjeta 2 (RestaurantCard)
-                  RestaurantCard(
-                    imagePath:
-                        'assets/images/Apoala.png', // Using a different image for variety
-                    name: 'Apoala',
-                    rating: 4.0,
-                    onTap: () {
+                    };
+                  } else if (restaurant.name == 'Apoala') {
+                    navigationAction = () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ApoalaScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const ApoalaScreen()),
                       );
-                    },
-                  ),
-
-                  const SizedBox(
-                      height:
-                          80), // Space between RestaurantCard2 and RestaurantCard3
-
-                  // Tarjeta 3 (RestaurantCard)
-                  RestaurantCard(
-                    imagePath:
-                        'assets/images/Babes.png', // Using a different image for variety
-                    name: 'Babe´s',
-                    rating: 4.5,
-                    onTap: () {
+                    };
+                  } else if (restaurant.name == 'Babe’s') {
+                    navigationAction = () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const BabesScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const BabesScreen()),
                       );
-                    },
-                  ),
-
-                  const SizedBox(height: 80), // Space after RestaurantCard3
-
-                  // Tarjeta 4 (RestaurantCard)
-                  RestaurantCard(
-                    imagePath:
-                        'assets/images/Bistrola 57.png', // Using a different image for variety
-                    name: 'Bistrola 57',
-                    rating: 4.0,
-                    onTap: () {
+                    };
+                  } else if (restaurant.name == 'Bistrola 57') {
+                    navigationAction = () {
                       Navigator.pushNamed(context, '/bistrola57');
-                    },
-                  ),
-
-                  const SizedBox(height: 80), // Space after RestaurantCard4
-
-                  // Tarjeta 5 (RestaurantCard)
-                  RestaurantCard(
-                    imagePath:
-                        'assets/images/Coyote Maya.png', // Using a different image for variety
-                    name: 'Coyote Maya',
-                    rating: 4.5,
-                    onTap: () {
+                    };
+                  } else if (restaurant.name == 'Coyote Maya') {
+                    navigationAction = () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const CoyoteScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const CoyoteScreen()),
                       );
-                    },
-                  ),
+                    };
+                  } else if (restaurant.name == 'Pita Mediterránea') {
+                    // Assuming a default screen or a message for this one if no specific screen exists
+                    navigationAction = () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text(
+                                'Navegando a la pantalla de ${restaurant.name}')),
+                      );
+                    };
+                  }
 
-                  const SizedBox(height: 80), // Space after RestaurantCard5
-
-                  // Tarjeta 6 (RestaurantCard)
-                  const RestaurantCard(
-                    imagePath:
-                        'assets/images/Pita Mediterranea.png', // Using a different image for variety
-                    name: 'Pita Mediterranea',
-                    rating: 4.0,
-                  ),
-                ],
+                  return Column(
+                    children: [
+                      RestaurantCard(
+                        imagePath: imagePath,
+                        name: restaurant.name,
+                        rating: restaurant.name == 'Teya Santa Lucía' ||
+                                restaurant.name == 'Coyote Maya' ||
+                                restaurant.name == 'Babe’s'
+                            ? 4.5 // Original ratings from hardcoded list
+                            : restaurant.name == 'Apoala' ||
+                                    restaurant.name == 'Bistrola 57' ||
+                                    restaurant.name == 'Pita Mediterránea'
+                                ? 4.0 // Original ratings from hardcoded list
+                                : 0.0, // Default if not found
+                        onTap: navigationAction,
+                      ),
+                      const SizedBox(height: 80),
+                    ],
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -199,7 +218,8 @@ class RestaurantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: InkWell( // Wrapped with InkWell
+      child: InkWell(
+        // Wrapped with InkWell
         onTap: onTap, // Assign the onTap callback
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -227,8 +247,8 @@ class RestaurantCard extends StatelessWidget {
                     ),
                     Container(
                       color: Colors.black.withAlpha(102),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 6),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

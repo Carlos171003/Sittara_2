@@ -14,13 +14,11 @@ class LoginCubit extends Cubit<LoginState> {
       // Simulate a network request
       await Future.delayed(const Duration(seconds: 2));
 
-      if (email == 'test@example.com' && password == 'Password123!') {
-        emit(state.copyWith(status: LoginStatus.success));
-      } else {
-        emit(state.copyWith(status: LoginStatus.error, errorMessage: 'Invalid credentials'));
-      }
+      // Bypass credential check
+      emit(state.copyWith(status: LoginStatus.success));
     } catch (e) {
-      emit(state.copyWith(status: LoginStatus.error, errorMessage: e.toString()));
+      emit(state.copyWith(
+          status: LoginStatus.error, errorMessage: e.toString()));
     }
   }
 }
