@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               children: [
-                Expanded(
+                Flexible( // Usar Flexible en lugar de Expanded
                   flex: 3, // Dar más espacio al TextField
                   child: TextField(
                     controller: _searchController,
@@ -125,11 +125,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reducir padding
                     ),
                   ),
                 ),
                 const SizedBox(width: 8), // Espacio entre el buscador y el filtro
-                Expanded(
+                Flexible( // Usar Flexible en lugar de Expanded
                   flex: 2, // Dar menos espacio al Dropdown
                   child: DropdownButtonFormField<String>(
                     value: _selectedFoodType,
@@ -138,12 +139,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reducir padding
                     ),
                     items: _foodTypes.map((type) {
                       return DropdownMenuItem(
                         value: type,
-                        child: Text(type),
+                        child: Text(
+                          type,
+                          overflow: TextOverflow.ellipsis, // Evitar desbordamiento de texto
+                        ),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -154,6 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     // Añadir una opción para limpiar el filtro
                     onTap: () {
+                      // Solo limpiar si ya hay un valor seleccionado, para no interferir con la apertura
                       if (_selectedFoodType != null) {
                         setState(() {
                           _selectedFoodType = null;
