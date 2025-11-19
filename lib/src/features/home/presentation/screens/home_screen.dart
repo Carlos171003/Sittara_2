@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ConstrainedBox( // Forzar un ancho máximo para diagnosticar
                     constraints: const BoxConstraints(maxWidth: 120), // Un ancho muy pequeño para probar
                     child: DropdownButtonFormField<String>(
-                      value: _selectedFoodType,
+                      initialValue: _selectedFoodType,
                       isDense: true, // Hacerlo más compacto
                       decoration: InputDecoration(
                         border: InputBorder.none, // Eliminar el borde
