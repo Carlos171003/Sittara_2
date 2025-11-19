@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Search bar and Food Type Filter
           Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Reducir padding horizontal
             child: Row(
               children: [
                 Flexible( // Usar Flexible en lugar de Expanded
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 4), // Reducir espacio entre el buscador y el filtro
+                // const SizedBox(width: 4), // Eliminado el espacio entre el buscador y el filtro
                 ConstrainedBox( // Forzar un ancho máximo para diagnosticar
                   constraints: const BoxConstraints(maxWidth: 120), // Un ancho muy pequeño para probar
                   child: DropdownButtonFormField<String>(
