@@ -113,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               children: [
                 Expanded(
+                  flex: 3, // Dar más espacio al TextField
                   child: TextField(
                     controller: _searchController,
                     onChanged: (query) {
@@ -129,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 8), // Espacio entre el buscador y el filtro
                 Expanded(
+                  flex: 2, // Dar menos espacio al Dropdown
                   child: DropdownButtonFormField<String>(
                     value: _selectedFoodType,
                     hint: const Text('Tipo de comida'),
