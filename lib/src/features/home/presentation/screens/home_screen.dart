@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'Noodles',
   ];
 
+
   @override
   void initState() {
     super.initState();
@@ -98,67 +99,53 @@ class _HomeScreenState extends State<HomeScreen> {
           // Search bar and Food Type Filter
           Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Reducir padding horizontal
-            child: FittedBox( // Usar FittedBox para forzar que el contenido quepa
-              fit: BoxFit.scaleDown, // Escalar el contenido si es necesario
-              child: Row(
-                children: [
-                  Flexible( // Usar Flexible en lugar de Expanded
-                    flex: 2, // Ajustar flex
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (query) {
-                        _filterRestaurants(query);
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Buscar restaurantes...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reducir padding
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            child: Row(
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _filterRestaurants,
+                    decoration: InputDecoration(
+                      hintText: 'Buscar restaurantes...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 8),
                     ),
                   ),
-                  // const SizedBox(width: 4), // Eliminado el espacio entre el buscador y el filtro
-                  ConstrainedBox( // Forzar un ancho máximo para diagnosticar
-                    constraints: const BoxConstraints(maxWidth: 120), // Un ancho muy pequeño para probar
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _selectedFoodType,
-                      isDense: true, // Hacerlo más compacto
-                      decoration: InputDecoration(
-                        border: InputBorder.none, // Eliminar el borde
-                        contentPadding: EdgeInsets.zero, // Padding mínimo
-                      ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.filter_list),
+                  onPressed: () {
+                    showMenu(
+                      context: context,
+                      position: RelativeRect.fromLTRB(
+                          MediaQuery.of(context).size.width,
+                          kToolbarHeight,
+                          0,
+                          0),
                       items: _foodTypes.map((type) {
-                        return DropdownMenuItem(
+                        return PopupMenuItem<String>(
                           value: type,
-                          child: Text(
-                            type,
-                            overflow: TextOverflow.ellipsis, // Evitar desbordamiento de texto
-                            style: const TextStyle(fontSize: 12), // Reducir tamaño de fuente
-                          ),
+                          child: Text(type),
                         );
                       }).toList(),
-                      onChanged: (value) {
+                    ).then((value) {
+                      if (value != null) {
                         setState(() {
                           _selectedFoodType = value;
                           _filterRestaurants(_searchController.text);
                         });
-                      },
-                      // Añadir una opción para limpiar el filtro
-                      onTap: () {
-                        if (_selectedFoodType != null) {
-                          setState(() {
-                            _selectedFoodType = null;
-                            _filterRestaurants(_searchController.text);
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                      }
+                    });
+                  },
+                ),
+              ],
             ),
           ),
           // Remaining content on white background

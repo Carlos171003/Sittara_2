@@ -169,20 +169,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       activeColor: Theme.of(context).colorScheme.primary,
                     ),
-                    const Expanded(
-                      child: Text(
-                        'Acepto el procesamiento de ',
-                        style: TextStyle(
-                          color: Colors.black45,
-                        ),
-                      ),
-                    ),
                     Expanded(
-                      child: Text(
-                        'Datos personales',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'Acepto el procesamiento de ',
+                          style: const TextStyle(
+                            color: Colors.black45,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Datos personales',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

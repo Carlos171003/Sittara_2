@@ -63,10 +63,13 @@ class _LoginFormState extends State<LoginForm> {
                   const SizedBox(height: 16),
                   const _RememberMeCheckbox(),
                   const SizedBox(height: 24),
-                  _LoginButton(
-                    formKey: _formKey,
-                    emailController: _emailController,
-                    passwordController: _passwordController,
+                  SizedBox(
+                    width: double.infinity,
+                    child: _LoginButton(
+                      formKey: _formKey,
+                      emailController: _emailController,
+                      passwordController: _passwordController,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
@@ -77,7 +80,10 @@ class _LoginFormState extends State<LoginForm> {
                         ),
                       );
                     },
-                    child: const Text('¿No tienes una cuenta? Regístrate'),
+                    child: const Text(
+                      '¿No tienes una cuenta? Regístrate',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),
@@ -96,7 +102,6 @@ class _LoginHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 300,
-      width: 300,
       child: Image.asset('assets/images/Sittara.png'),
     );
   }
@@ -179,6 +184,7 @@ class _RememberMeCheckbox extends StatelessWidget {
       builder: (context, state) {
         return CheckboxListTile(
           title: const Text('Remember Me'),
+          dense: true,
           value: state.isRememberMeChecked,
           onChanged: (newValue) {
             context.read<LoginCubit>().toggleRememberMe(newValue ?? false);

@@ -37,9 +37,18 @@ class _SittaraAppState extends State<SittaraApp> {
   }
 
   Future<void> _initializeApp() async {
-    // These are the async operations that were slowing down the start
-    await dotenv.load(fileName: ".env");
-    await SupabaseInitializer.initialize();
+    try {
+      print("Initializing app...");
+      // These are the async operations that were slowing down the start
+      await dotenv.load(fileName: ".env");
+      print("dotenv loaded");
+      await SupabaseInitializer.initialize();
+      print("Supabase initialized");
+      print("App initialization complete.");
+    } catch (e) {
+      print("Error during app initialization: $e");
+      rethrow;
+    }
   }
 
   @override
@@ -47,8 +56,10 @@ class _SittaraAppState extends State<SittaraApp> {
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
+        print("FutureBuilder snapshot state: ${snapshot.connectionState}");
         // While waiting for initialization, show a loading screen
         if (snapshot.connectionState == ConnectionState.waiting) {
+          print("FutureBuilder: waiting");
           return const MaterialApp(
             debugShowCheckedModeBanner: false,
             home: Scaffold(
@@ -61,6 +72,7 @@ class _SittaraAppState extends State<SittaraApp> {
 
         // If initialization fails, show an error screen
         if (snapshot.hasError) {
+          print("FutureBuilder: has error: ${snapshot.error}");
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             home: Scaffold(
@@ -72,11 +84,16 @@ class _SittaraAppState extends State<SittaraApp> {
           );
         }
 
+        print("FutureBuilder: done, showing app");
         // Once initialization is complete, show the main app
         return ChangeNotifierProvider(
-          create: (context) => DistanceProvider(
-            apiKey: dotenv.env['ORS_API_KEY']!,
-          ),
+          create: (context) {
+            final apiKey = dotenv.env['ORS_API_KEY'];
+            if (apiKey == null || apiKey.isEmpty) {
+              throw Exception('ORS_API_KEY no se encuentra en el archivo .env');
+            }
+            return DistanceProvider(apiKey: apiKey);
+          },
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Sittara',
@@ -94,9 +111,17 @@ class _SittaraAppState extends State<SittaraApp> {
               '/menu': (context) => const MenuScreen(),
               '/bistrola57': (context) => const Bistrola57Screen(),
               '/location_request': (context) => const LocationRequestScreen(),
-              '/nearby_restaurants': (context) => NearbyRestaurantsScreen(
-                  userLocation:
-                      ModalRoute.of(context)!.settings.arguments as Position),
+              '/nearby_restaurants': (context) {
+                final Object? args = ModalRoute.of(context)?.settings.arguments;
+                if (args is Position) {
+                  return NearbyRestaurantsScreen(userLocation: args);
+                }
+                return const Scaffold(
+                  body: Center(
+                    child: Text('Error: Ubicación no proporcionada.'),
+                  ),
+                );
+              },
             },
           ),
         );

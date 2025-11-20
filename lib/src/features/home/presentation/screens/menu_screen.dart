@@ -32,13 +32,16 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Menu'),
+      ),
       backgroundColor: Colors.grey[100],
-      child: SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _MenuItemWidget(
                 icon: Icons.home,
@@ -110,7 +113,7 @@ class MenuScreen extends StatelessWidget {
                 text: 'Opiniones',
                 onTap: () {},
               ),
-              _menuItemNotificaciones(),
+              const _MenuItemNotificaciones(),
               const SizedBox(height: 24), // Added SizedBox for spacing
               _MenuItemWidget(
                 icon: Icons.logout,
@@ -125,8 +128,13 @@ class MenuScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _menuItemNotificaciones() {
+class _MenuItemNotificaciones extends StatelessWidget {
+  const _MenuItemNotificaciones();
+
+  @override
+  Widget build(BuildContext context) {
     return ListTile(
       leading: Stack(
         clipBehavior: Clip.none,

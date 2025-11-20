@@ -33,7 +33,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - .env # <-- AÑADIR ESTA LÍNEA
+    - .env
     - assets/images/
     - assets/images/Apoala.png
     - assets/images/Babes.png
@@ -41,6 +41,7 @@ flutter:
     - assets/images/Coyote Maya.png
     - assets/images/LogoFinal.png
     - assets/images/Pita Mediterranea.png
+    - assets/images/Sittara.png
     - assets/images/Teya Santa Lucia.png
 
 icons_launcher:
