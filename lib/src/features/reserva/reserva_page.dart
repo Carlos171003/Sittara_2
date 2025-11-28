@@ -29,6 +29,8 @@ class _ReservaPageState extends State<ReservaPage> {
   int _personas = 1;
   String? _zonaSeleccionada = 'Terraza';
   bool _isFormComplete = false;
+  DateTime? _fechaSeleccionada;
+  TimeOfDay? _horaSeleccionada;
 
   // Paleta de colores
   final Color primary = const Color.fromARGB(255, 138, 158, 141);
@@ -96,14 +98,74 @@ class _ReservaPageState extends State<ReservaPage> {
 
     try {
       final supabase = Supabase.instance.client;
-      await supabase.from('reservations').insert({
-        'nombre': _nombreController.text,
-        'telefono': _telefonoController.text,
-        'fecha_reserva': _fechaController.text,
-        'time': _horaController.text,
+
+      // Convertir fecha a formato ISO (YYYY-MM-DD)
+      String fechaISO = '';
+      if (_fechaSeleccionada != null) {
+        fechaISO = _fechaSeleccionada!.toIso8601String().split('T')[0];
+      } else {
+        // Si no hay fecha seleccionada, intentar parsear del texto
+        final fechaParts = _fechaController.text.split('/');
+        if (fechaParts.length == 3) {
+          final day = fechaParts[0].padLeft(2, '0');
+          final month = fechaParts[1].padLeft(2, '0');
+          final year = fechaParts[2];
+          fechaISO = '$year-$month-$day';
+        } else {
+          throw Exception('Formato de fecha inválido');
+        }
+      }
+
+      // Convertir hora a formato 24 horas (HH:mm)
+      String hora24 = '';
+      if (_horaSeleccionada != null) {
+        final hour = _horaSeleccionada!.hour.toString().padLeft(2, '0');
+        final minute = _horaSeleccionada!.minute.toString().padLeft(2, '0');
+        hora24 = '$hour:$minute';
+      } else {
+        // Si no hay hora seleccionada, intentar parsear del texto
+        final horaText = _horaController.text;
+        // Intentar parsear formato 12 horas (ej: "2:30 PM")
+        if (horaText.contains('AM') || horaText.contains('PM')) {
+          final parts = horaText
+              .replaceAll('AM', '')
+              .replaceAll('PM', '')
+              .trim()
+              .split(':');
+          if (parts.length == 2) {
+            int hour = int.parse(parts[0]);
+            int minute = int.parse(parts[1]);
+            if (horaText.contains('PM') && hour != 12) hour += 12;
+            if (horaText.contains('AM') && hour == 12) hour = 0;
+            hora24 =
+                '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+          } else {
+            throw Exception('Formato de hora inválido');
+          }
+        } else {
+          // Asumir formato 24 horas
+          hora24 = horaText;
+        }
+      }
+
+      // Preparar los datos de la reserva
+      final reservaData = <String, dynamic>{
+        'nombre': _nombreController.text.trim(),
+        'telefono': _telefonoController.text.trim(),
+        'fecha_reserva': fechaISO,
+        'time': hora24,
         'personas': _personas,
         'zona': _zonaSeleccionada,
-      });
+        'created_at': DateTime.now().toIso8601String(),
+      };
+
+      // Agregar user_id si el usuario está autenticado
+      final user = supabase.auth.currentUser;
+      if (user != null) {
+        reservaData['user_id'] = user.id;
+      }
+
+      await supabase.from('reservations').insert(reservaData);
 
       // Cierra el indicador de carga
       // ignore: use_build_context_synchronously
@@ -117,14 +179,21 @@ class _ReservaPageState extends State<ReservaPage> {
       // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
 
-      // Muestra un mensaje de error específico de Supabase
+      // Muestra un mensaje de error específico de Supabase con más detalles
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Error de Supabase: ${error.message}'),
-            backgroundColor: Colors.red),
+            content: Text(
+                'Error al guardar la reserva: ${error.message}\nCódigo: ${error.code ?? "N/A"}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5)),
       );
-    } catch (error) {
+
+      // Imprimir detalles del error para depuración
+      debugPrint('Error de Supabase: ${error.message}');
+      debugPrint('Código: ${error.code}');
+      debugPrint('Detalles: ${error.details}');
+    } catch (error, stackTrace) {
       // Cierra el indicador de carga
       // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
@@ -134,8 +203,13 @@ class _ReservaPageState extends State<ReservaPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('Error al guardar la reserva: $error'),
-            backgroundColor: Colors.red),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5)),
       );
+
+      // Imprimir detalles del error para depuración
+      debugPrint('Error al guardar reserva: $error');
+      debugPrint('Stack trace: $stackTrace');
     }
   }
 
@@ -268,8 +342,11 @@ class _ReservaPageState extends State<ReservaPage> {
           lastDate: DateTime.now().add(const Duration(days: 365)),
         );
         if (pickedDate != null) {
-          _fechaController.text =
-              "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+          setState(() {
+            _fechaSeleccionada = pickedDate;
+            _fechaController.text =
+                "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+          });
           // ignore: use_build_context_synchronously
           FocusScope.of(context).requestFocus(_horaFocusNode);
         }
@@ -292,8 +369,11 @@ class _ReservaPageState extends State<ReservaPage> {
           initialTime: TimeOfDay.now(),
         );
         if (pickedTime != null) {
-          // ignore: use_build_context_synchronously
-          _horaController.text = pickedTime.format(context);
+          setState(() {
+            _horaSeleccionada = pickedTime;
+            // ignore: use_build_context_synchronously
+            _horaController.text = pickedTime.format(context);
+          });
           // ignore: use_build_context_synchronously
           FocusScope.of(context).unfocus(); // Cierra el teclado
         }
