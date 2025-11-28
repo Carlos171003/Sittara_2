@@ -38,7 +38,7 @@ class SittaraApp extends StatefulWidget {
 }
 
 class _SittaraAppState extends State<SittaraApp> {
-  late final Future<void> _initialization;
+  late final Future<Session?> _initialization;
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _appLinksSubscription;
 
@@ -55,14 +55,15 @@ class _SittaraAppState extends State<SittaraApp> {
     super.dispose();
   }
 
-  Future<void> _initializeApp() async {
+  Future<Session?> _initializeApp() async {
     try {
       log("Initializing app...", name: "INIT");
       await dotenv.load(fileName: ".env");
       log("dotenv loaded", name: "INIT");
-      await SupabaseInitializer.initialize();
+      final session = await SupabaseInitializer.initialize();
       log("Supabase initialized", name: "INIT");
       log("App initialization complete.", name: "INIT");
+      return session;
     } catch (e) {
       log("Error during app initialization: $e", name: "INIT");
       rethrow;
@@ -112,7 +113,7 @@ class _SittaraAppState extends State<SittaraApp> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<Session?>(
       future: _initialization,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -159,7 +160,7 @@ class _SittaraAppState extends State<SittaraApp> {
               useMaterial3: true,
             ),
             navigatorKey: navigatorKey,
-            initialRoute: '/login',
+            initialRoute: snapshot.data == null ? '/login' : '/home',
             routes: {
               '/login': (_) => const LoginScreen(),
               '/home': (_) => const HomeScreen(),
