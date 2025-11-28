@@ -18,12 +18,10 @@ class SupabaseInitializer {
     await Supabase.initialize(
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
-      authFlowType: AuthFlowType.implicit, // set to implicit by default
-      authCallbackUrlHostname: 'auth-callback',
     );
 
-    // Use `initialSession` to obtain the initial session when the app starts.
-    final initialSession = await Supabase.instance.client.auth.initialSession;
+    // Use `currentSession` to obtain the initial session when the app starts.
+    final initialSession = Supabase.instance.client.auth.currentSession;
     return initialSession;
   }
 }
