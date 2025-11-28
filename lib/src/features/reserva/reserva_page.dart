@@ -152,7 +152,7 @@ class _ReservaPageState extends State<ReservaPage> {
       final reservaData = <String, dynamic>{
         'nombre': _nombreController.text.trim(),
         'telefono': _telefonoController.text.trim(),
-        'fecha_reserva': fechaISO,
+        'reservation_date': fechaISO,
         'time': hora24,
         'personas': _personas,
         'zona': _zonaSeleccionada,
