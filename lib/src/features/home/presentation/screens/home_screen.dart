@@ -5,6 +5,7 @@ import 'apoala_screen.dart'; // Import the ApoalaScreen
 import 'coyote_screen.dart'; // Import the CoyoteScreen
 import 'babes_screen.dart'; // Import the BabesScreen
 import '../../../restaurants_data.dart';
+import 'dart:developer'; // Import for log function
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Session is valid, no check required
     final session = Supabase.instance.client.auth.currentSession;
+    log('Current session user email: ${session?.user?.email}');
     _allRestaurants = elegantRestaurantsMerida;
     _filteredRestaurants = _allRestaurants;
   }
