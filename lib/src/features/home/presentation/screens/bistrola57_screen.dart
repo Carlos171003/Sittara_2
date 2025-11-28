@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_24/src/features/reserva/reserva_page.dart'; // Importa ReservaPage
 import '../widgets/info_list.dart';
 import '../widgets/specialties_card.dart';
 
