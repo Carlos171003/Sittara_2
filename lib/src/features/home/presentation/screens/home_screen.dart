@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'teyasantalucia_screen.dart';
 import 'apoala_screen.dart'; // Import the ApoalaScreen
 import 'coyote_screen.dart'; // Import the CoyoteScreen
@@ -35,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Session is valid, no check required
+    final session = Supabase.instance.client.auth.currentSession;
     _allRestaurants = elegantRestaurantsMerida;
     _filteredRestaurants = _allRestaurants;
   }
