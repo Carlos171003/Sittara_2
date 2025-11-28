@@ -19,6 +19,7 @@ class SupabaseInitializer {
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
       authFlowType: AuthFlowType.implicit, // set to implicit by default
+      authCallbackUrlHostname: 'auth-callback',
     );
   }
 }
