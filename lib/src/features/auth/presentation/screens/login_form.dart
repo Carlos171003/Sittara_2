@@ -57,6 +57,31 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
+  Future<void> _signInWithApple() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.apple,
+        redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+      );
+    } catch (error) {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop(); // Close loading indicator
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al iniciar sesión con Apple: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -114,6 +139,24 @@ class _LoginFormState extends State<LoginForm> {
                       // TODO: Replace with actual Google logo asset
                       icon: const Icon(Icons.g_mobiledata, size: 24),
                       label: const Text('Iniciar sesión con Google'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Apple Sign-In Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        shape: const StadiumBorder(),
+                        backgroundColor: Colors.black, // Apple's color
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                      ),
+                      onPressed: _signInWithApple,
+                      // TODO: Replace with actual Apple logo asset
+                      icon: const Icon(Icons.apple, size: 24),
+                      label: const Text('Iniciar sesión con Apple'),
                     ),
                   ),
                   const SizedBox(height: 16),
