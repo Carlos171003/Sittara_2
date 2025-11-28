@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'login_screen.dart';
 
 class VerifyEmailScreen extends StatelessWidget {
