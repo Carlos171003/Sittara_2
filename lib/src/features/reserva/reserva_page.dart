@@ -97,7 +97,7 @@ class _ReservaPageState extends State<ReservaPage> {
     try {
       final supabase = Supabase.instance.client;
       await supabase.from('reservations').insert({
-        'name': _nombreController.text,
+        'nombre': _nombreController.text,
         'phone': _telefonoController.text,
         'reservation_date': _fechaController
             .text, // Se guarda como texto, asegúrate que la columna en Supabase sea de tipo 'text' o 'varchar'
