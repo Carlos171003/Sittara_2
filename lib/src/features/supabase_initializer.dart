@@ -18,6 +18,7 @@ class SupabaseInitializer {
     await Supabase.initialize(
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
+      authFlowType: AuthFlowType.implicit, // set to implicit by default
     );
   }
 }
