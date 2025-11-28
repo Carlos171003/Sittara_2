@@ -98,12 +98,11 @@ class _ReservaPageState extends State<ReservaPage> {
       final supabase = Supabase.instance.client;
       await supabase.from('reservations').insert({
         'nombre': _nombreController.text,
-        'phone': _telefonoController.text,
-        'reservation_date': _fechaController
-            .text, // Se guarda como texto, asegúrate que la columna en Supabase sea de tipo 'text' o 'varchar'
-        'time': _horaController.text, // Lo mismo para la hora
-        'people': _personas,
-        'zone': _zonaSeleccionada,
+        'telefono': _telefonoController.text,
+        'fecha_reserva': _fechaController.text,
+        'time': _horaController.text,
+        'personas': _personas,
+        'zona': _zonaSeleccionada,
       });
 
       // Cierra el indicador de carga
