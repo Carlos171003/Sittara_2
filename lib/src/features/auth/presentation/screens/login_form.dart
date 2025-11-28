@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Import for Supabase client
 import '../../application/login_cubit.dart';
 import '../../application/login_state.dart';
 import '../../registration_screen.dart';
@@ -28,6 +29,32 @@ class _LoginFormState extends State<LoginForm> {
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _signInWithGoogle() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+      );
+      // The rest of the navigation logic will be handled by the deep link in main.dart
+    } catch (error) {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop(); // Close loading indicator
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al iniciar sesión con Google: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -69,6 +96,24 @@ class _LoginFormState extends State<LoginForm> {
                       formKey: _formKey,
                       emailController: _emailController,
                       passwordController: _passwordController,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Google Sign-In Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        shape: const StadiumBorder(),
+                        backgroundColor: Colors.blue, // Google's color
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                      ),
+                      onPressed: _signInWithGoogle,
+                      // TODO: Replace with actual Google logo asset
+                      icon: const Icon(Icons.g_mobiledata, size: 24),
+                      label: const Text('Iniciar sesión con Google'),
                     ),
                   ),
                   const SizedBox(height: 16),
