@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'presentation/screens/login_screen.dart'; // Assuming this is the SignInScreen equivalent
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'presentation/screens/verify_email_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -221,9 +223,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       try {
                         final supabase = Supabase.instance.client;
 
+                        // Obtener la URL de Supabase desde las variables de entorno
+                        final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
+                        // Construir la URL de redirección usando la URL de Supabase
+                        // Esto redirigirá a la app después de verificar el correo
+                        final redirectUrl = supabaseUrl.isNotEmpty
+                            ? '$supabaseUrl/auth/v1/callback'
+                            : 'io.supabase.flutterquickstart://login-callback';
+
                         final authResponse = await supabase.auth.signUp(
                           email: _emailController.text.trim(),
                           password: _passwordController.text.trim(),
+                          emailRedirectTo: redirectUrl,
+                          data: {
+                            'full_name': _fullNameController.text.trim(),
+                          },
                         );
 
                         if (!context.mounted) return;
@@ -251,10 +265,47 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 backgroundColor: Colors.green),
                           );
 
-                          // Navigate to home screen
-                          Navigator.of(context).pushReplacementNamed('/home');
+                          // Navigate to verify email screen
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const VerifyEmailScreen(),
+                            ),
+                          );
                         }
-                      } catch (error) {
+                      } on AuthRetryableFetchException {
+                        if (!context.mounted) return;
+                        Navigator.of(context).pop(); // Hide loading indicator
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0)),
+                            title: const Text('Error de Conexión',
+                                textAlign: TextAlign.center),
+                            content: Column(
+                              // Changed to Column to allow error message
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.wifi_off,
+                                    color: Colors.orangeAccent, size: 50),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  'No se pudo conectar al servidor. Por favor, revise su conexión a internet e inténtelo de nuevo.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.black54),
+                                ),
+                              ],
+                            ),
+                            actionsAlignment: MainAxisAlignment.center,
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('Aceptar'),
+                              ),
+                            ],
+                          ),
+                        );
+                      } catch (e) {
                         if (!context.mounted) return;
 
                         // Hide loading indicator
@@ -265,7 +316,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                              content: Text('Error en el registro: $error'),
+                              content: Text('Error en el registro: $e'),
                               backgroundColor: Colors.red),
                         );
                       }
@@ -334,12 +385,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (e) => const LoginScreen(),
-                          ),
-                        );
+                        Navigator.pushNamed(context, '/login');
                       },
                       child: Text(
                         'Iniciar sesión',

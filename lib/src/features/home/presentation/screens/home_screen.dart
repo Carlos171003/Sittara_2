@@ -32,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
     'Noodles',
   ];
 
-
   @override
   void initState() {
     super.initState();
@@ -40,17 +39,18 @@ class _HomeScreenState extends State<HomeScreen> {
     _filteredRestaurants = _allRestaurants;
   }
 
-        void _filterRestaurants(String query) {
-          setState(() {
-            _filteredRestaurants = _allRestaurants.where((restaurant) {
-              final matchesQuery =
-                  restaurant.name.toLowerCase().contains(query.toLowerCase());
-              final matchesFoodType = _selectedFoodType == null ||
-                  restaurant.foodTypes.contains(_selectedFoodType);
-              return matchesQuery && matchesFoodType;
-            }).toList();
-          });
-        }
+  void _filterRestaurants(String query) {
+    setState(() {
+      _filteredRestaurants = _allRestaurants.where((restaurant) {
+        final matchesQuery =
+            restaurant.name.toLowerCase().contains(query.toLowerCase());
+        final matchesFoodType = _selectedFoodType == null ||
+            restaurant.foodTypes.contains(_selectedFoodType);
+        return matchesQuery && matchesFoodType;
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distribuye los elementos
+                  mainAxisAlignment: MainAxisAlignment
+                      .spaceBetween, // Distribuye los elementos
                   children: [
                     IconButton(
                       padding: const EdgeInsets.all(20),
@@ -90,7 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       backgroundImage:
                           AssetImage('assets/images/LogoFinal.png'),
                     ),
-                    const SizedBox(width: 60), // Añadir espacio para balancear, ya que el IconButton está a la izquierda
+                    const SizedBox(
+                        width:
+                            60), // Añadir espacio para balancear, ya que el IconButton está a la izquierda
                   ],
                 ),
               ),
@@ -100,51 +103,75 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Flexible(
-                  flex: 3,
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _filterRestaurants,
-                    decoration: InputDecoration(
-                      hintText: 'Buscar restaurantes...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                Row(
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: _filterRestaurants,
+                        decoration: InputDecoration(
+                          hintText: 'Buscar restaurantes...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 8),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.filter_list),
+                      onPressed: () {
+                        final menuItems = ['Todos', ..._foodTypes];
+                        showMenu(
+                          context: context,
+                          position: RelativeRect.fromLTRB(
+                              MediaQuery.of(context).size.width,
+                              kToolbarHeight +
+                                  40, // Adjust position to avoid overlap
+                              0,
+                              0),
+                          items: menuItems.map((type) {
+                            return PopupMenuItem<String>(
+                              value: type,
+                              child: Text(type),
+                            );
+                          }).toList(),
+                        ).then((value) {
+                          if (value != null) {
+                            setState(() {
+                              if (value == 'Todos') {
+                                _selectedFoodType = null;
+                              } else {
+                                _selectedFoodType = value;
+                              }
+                              _filterRestaurants(_searchController.text);
+                            });
+                          }
+                        });
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.filter_list),
-                  onPressed: () {
-                    showMenu(
-                      context: context,
-                      position: RelativeRect.fromLTRB(
-                          MediaQuery.of(context).size.width,
-                          kToolbarHeight,
-                          0,
-                          0),
-                      items: _foodTypes.map((type) {
-                        return PopupMenuItem<String>(
-                          value: type,
-                          child: Text(type),
-                        );
-                      }).toList(),
-                    ).then((value) {
-                      if (value != null) {
+                if (_selectedFoodType != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Chip(
+                      label: Text(_selectedFoodType!),
+                      onDeleted: () {
                         setState(() {
-                          _selectedFoodType = value;
+                          _selectedFoodType = null;
                           _filterRestaurants(_searchController.text);
                         });
-                      }
-                    });
-                  },
-                ),
+                      },
+                    ),
+                  ),
               ],
             ),
           ),

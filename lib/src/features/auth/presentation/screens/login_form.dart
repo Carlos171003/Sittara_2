@@ -102,7 +102,7 @@ class _LoginHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 300,
-      child: Image.asset('assets/images/Sittara.png'),
+      child: Image.asset('assets/images/Sittararemove.png'),
     );
   }
 }

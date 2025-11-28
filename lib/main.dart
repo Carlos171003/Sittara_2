@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'src/features/supabase_initializer.dart'; // Import SupabaseInitializer
+import 'src/features/supabase_initializer.dart';
+import 'package:app_links/app_links.dart';
 
 import 'src/features/auth/presentation/screens/login_screen.dart';
+import 'src/features/auth/presentation/screens/auth_callback_screen.dart';
 import 'src/features/home/presentation/screens/menu_screen.dart';
 import 'src/features/home/presentation/screens/home_screen.dart';
 import 'src/features/home/presentation/screens/bistrola57_screen.dart';
+import 'src/features/home/presentation/screens/opiniones_screen.dart';
+import 'src/features/home/presentation/screens/notificaciones_screen.dart';
 import 'src/features/location_request_screen.dart';
 import 'src/features/nearby_restaurants_screen.dart';
 
-import 'package:provider/provider.dart'; // Importar provider
-import 'package:flutter_application_24/src/features/distance_provider.dart'; // Importar DistanceProvider
+import 'package:flutter_application_24/src/features/reserva/reserva_page.dart';
+import 'package:flutter_application_24/src/pages/confirmation_page.dart';
+
+import 'package:provider/provider.dart';
+import 'package:flutter_application_24/src/features/distance_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
+import 'dart:developer';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
-  // Ensure Flutter widgets are initialized before running the app
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const SittaraApp());
 }
@@ -27,27 +38,75 @@ class SittaraApp extends StatefulWidget {
 }
 
 class _SittaraAppState extends State<SittaraApp> {
-  // Future to represent the initialization process
   late final Future<void> _initialization;
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _appLinksSubscription;
 
   @override
   void initState() {
     super.initState();
     _initialization = _initializeApp();
+    _initDeepLinks();
+  }
+
+  @override
+  void dispose() {
+    _appLinksSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _initializeApp() async {
     try {
-      print("Initializing app...");
-      // These are the async operations that were slowing down the start
+      log("Initializing app...", name: "INIT");
       await dotenv.load(fileName: ".env");
-      print("dotenv loaded");
+      log("dotenv loaded", name: "INIT");
       await SupabaseInitializer.initialize();
-      print("Supabase initialized");
-      print("App initialization complete.");
+      log("Supabase initialized", name: "INIT");
+      log("App initialization complete.", name: "INIT");
     } catch (e) {
-      print("Error during app initialization: $e");
+      log("Error during app initialization: $e", name: "INIT");
       rethrow;
+    }
+  }
+
+  Future<void> _initDeepLinks() async {
+    _appLinks = AppLinks();
+
+    final appLink = await _appLinks.getInitialLink();
+    if (appLink != null) {
+      _handleDeepLink(appLink);
+    }
+
+    _appLinksSubscription = _appLinks.uriLinkStream.listen((uri) {
+      _handleDeepLink(uri);
+    });
+  }
+
+  Future<void> _handleDeepLink(Uri uri) async {
+    log("Deep Link received: $uri", name: "DEEPLINK");
+
+    if (uri.scheme == 'io.supabase.flutterquickstart' &&
+        uri.host == 'login-callback') {
+      try {
+        await Supabase.instance.client.auth.getSessionFromUrl(uri);
+        navigatorKey.currentState
+            ?.pushNamedAndRemoveUntil('/auth-callback', (route) => false);
+      } catch (e) {
+        log("Error handling deep link: $e", name: "DEEPLINK");
+        navigatorKey.currentState
+            ?.pushNamedAndRemoveUntil('/auth-callback', (route) => false);
+      }
+    } else if (uri.toString().contains('supabase.co') &&
+        uri.queryParameters.containsKey('token')) {
+      try {
+        await Supabase.instance.client.auth.getSessionFromUrl(uri);
+        navigatorKey.currentState
+            ?.pushNamedAndRemoveUntil('/auth-callback', (route) => false);
+      } catch (e) {
+        log("Email verification deep link error: $e", name: "DEEPLINK");
+        navigatorKey.currentState
+            ?.pushNamedAndRemoveUntil('/auth-callback', (route) => false);
+      }
     }
   }
 
@@ -56,23 +115,18 @@ class _SittaraAppState extends State<SittaraApp> {
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
-        print("FutureBuilder snapshot state: ${snapshot.connectionState}");
-        // While waiting for initialization, show a loading screen
         if (snapshot.connectionState == ConnectionState.waiting) {
-          print("FutureBuilder: waiting");
+          log("FutureBuilder: waiting", name: "INIT");
           return const MaterialApp(
             debugShowCheckedModeBanner: false,
             home: Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
+              body: Center(child: CircularProgressIndicator()),
             ),
           );
         }
 
-        // If initialization fails, show an error screen
         if (snapshot.hasError) {
-          print("FutureBuilder: has error: ${snapshot.error}");
+          log("FutureBuilder: error ${snapshot.error}", name: "INIT");
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             home: Scaffold(
@@ -84,8 +138,8 @@ class _SittaraAppState extends State<SittaraApp> {
           );
         }
 
-        print("FutureBuilder: done, showing app");
-        // Once initialization is complete, show the main app
+        log("FutureBuilder: done — loading app", name: "INIT");
+
         return ChangeNotifierProvider(
           create: (context) {
             final apiKey = dotenv.env['ORS_API_KEY'];
@@ -104,15 +158,19 @@ class _SittaraAppState extends State<SittaraApp> {
               ),
               useMaterial3: true,
             ),
+            navigatorKey: navigatorKey,
             initialRoute: '/login',
             routes: {
-              '/login': (context) => const LoginScreen(),
-              '/home': (context) => const HomeScreen(),
-              '/menu': (context) => const MenuScreen(),
-              '/bistrola57': (context) => const Bistrola57Screen(),
-              '/location_request': (context) => const LocationRequestScreen(),
+              '/login': (_) => const LoginScreen(),
+              '/home': (_) => const HomeScreen(),
+              '/menu': (_) => const MenuScreen(),
+              '/bistrola57': (_) => const Bistrola57Screen(),
+              '/opiniones': (_) => const OpinionesScreen(),
+              '/notificaciones': (_) => const NotificacionesScreen(),
+              '/auth-callback': (_) => const AuthCallbackScreen(),
+              '/location_request': (_) => const LocationRequestScreen(),
               '/nearby_restaurants': (context) {
-                final Object? args = ModalRoute.of(context)?.settings.arguments;
+                final args = ModalRoute.of(context)?.settings.arguments;
                 if (args is Position) {
                   return NearbyRestaurantsScreen(userLocation: args);
                 }
@@ -122,6 +180,8 @@ class _SittaraAppState extends State<SittaraApp> {
                   ),
                 );
               },
+              '/reserva': (_) => const ReservaPage(),
+              '/congratulations': (_) => const ConfirmationPage(),
             },
           ),
         );

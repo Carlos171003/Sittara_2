@@ -111,9 +111,11 @@ class MenuScreen extends StatelessWidget {
               _MenuItemWidget(
                 icon: Icons.chat_bubble,
                 text: 'Opiniones',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, '/opiniones');
+                },
               ),
-              const _MenuItemNotificaciones(),
+              _MenuItemNotificaciones(),
               const SizedBox(height: 24), // Added SizedBox for spacing
               _MenuItemWidget(
                 icon: Icons.logout,
@@ -158,7 +160,9 @@ class _MenuItemNotificaciones extends StatelessWidget {
         'Notificaciones',
         style: TextStyle(fontSize: 18, color: Colors.black),
       ),
-      onTap: () {},
+      onTap: () {
+        Navigator.pushNamed(context, '/notificaciones');
+      },
       contentPadding: const EdgeInsets.symmetric(vertical: 16),
     );
   }

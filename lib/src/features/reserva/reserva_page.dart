@@ -81,7 +81,6 @@ class _ReservaPageState extends State<ReservaPage> {
   }
 
   // Procesa el envío del formulario
-  // Procesa el envío del formulario
   Future<void> _submitForm() async {
     // Primero, valida que todos los campos del formulario cumplan las reglas
     if (!_formKey.currentState!.validate()) {
@@ -111,19 +110,27 @@ class _ReservaPageState extends State<ReservaPage> {
       // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
 
-      // Muestra un mensaje de éxito
+      // Navega a la página de confirmación
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushNamed('/congratulations');
+    } on PostgrestException catch (error) {
+      // Cierra el indicador de carga
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop();
+
+      // Muestra un mensaje de error específico de Supabase
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Reserva confirmada. ¡Gracias!'),
-            backgroundColor: Colors.green),
+        SnackBar(
+            content: Text('Error de Supabase: ${error.message}'),
+            backgroundColor: Colors.red),
       );
     } catch (error) {
       // Cierra el indicador de carga
       // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
 
-      // Muestra un mensaje de error
+      // Muestra un mensaje de error genérico
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

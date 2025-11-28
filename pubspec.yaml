@@ -23,6 +23,8 @@ dependencies:
   url_launcher: ^6.3.2
   latlong2: ^0.9.1
   supabase_flutter: ^2.10.3
+  app_links: ^6.4.1
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:
@@ -42,7 +44,7 @@ flutter:
     - assets/images/LogoFinal.png
     - assets/images/Pita Mediterranea.png
     - assets/images/Sittara.png
-    - assets/images/Teya Santa Lucia.png
+    - assets/images/Sittararemove.png
 
 icons_launcher:
   image_path: "assets/images/ICON.png"

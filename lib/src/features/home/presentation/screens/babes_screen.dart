@@ -175,19 +175,24 @@ class BabesScreen extends StatelessWidget {
 
                   // Botón para hacer reserva
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 48),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: isMobile ? 16 : 48),
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ReservaPage()),
+                          MaterialPageRoute(
+                              builder: (context) => const ReservaPage()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary, // Color de fondo del botón
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .primary, // Color de fondo del botón
                         foregroundColor: Colors.white, // Color del texto
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        textStyle: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
