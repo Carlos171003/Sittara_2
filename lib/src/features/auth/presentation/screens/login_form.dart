@@ -82,6 +82,32 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
+  Future<void> _signInWithGitHub() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.github,
+        authScreenLaunchMode: LaunchMode.inAppWebView,
+        redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+      );
+    } catch (error) {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop(); // Close loading indicator
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al iniciar sesión con GitHub: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -157,6 +183,24 @@ class _LoginFormState extends State<LoginForm> {
                       // TODO: Replace with actual Apple logo asset
                       icon: const Icon(Icons.apple, size: 24),
                       label: const Text('Iniciar sesión con Apple'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // GitHub Sign-In Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        shape: const StadiumBorder(),
+                        backgroundColor: Colors.grey[800], // GitHub's color
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                      ),
+                      onPressed: _signInWithGitHub,
+                      // TODO: Replace with actual GitHub logo asset
+                      icon: const Icon(Icons.code, size: 24),
+                      label: const Text('Iniciar sesión con GitHub'),
                     ),
                   ),
                   const SizedBox(height: 16),
