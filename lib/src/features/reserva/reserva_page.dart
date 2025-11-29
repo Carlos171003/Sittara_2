@@ -153,7 +153,7 @@ class _ReservaPageState extends State<ReservaPage> {
         'nombre': _nombreController.text.trim(),
         'telefono': _telefonoController.text.trim(),
         'reservation_date': fechaISO,
-        'time': hora24,
+        'reservation_time': hora24,
         'personas': _personas,
         'zona': _zonaSeleccionada,
         'created_at': DateTime.now().toIso8601String(),
